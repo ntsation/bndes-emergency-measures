@@ -1,7 +1,8 @@
 import requests
 import pandas as pd
 
-url = 'https://dadosabertos.bndes.gov.br/api/3/action/datastore_search?resource_id=165243b3-e57b-47e6-bd79-65d12ead7c02&limit=5000000'
+url = 'https://dadosabertos.bndes.gov.br/api/3/action/datastore_search?' \
+      'resource_id=165243b3-e57b-47e6-bd79-65d12ead7c02&limit=5000000'
 
 r = requests.get(url)
 
