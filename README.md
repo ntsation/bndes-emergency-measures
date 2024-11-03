@@ -7,7 +7,7 @@ This project is designed to fetch, preprocess, and analyze data from the Brazili
 - **fetch_data.py**: Fetches data from the BNDES API and loads it into a DataFrame.
 - **process_data.py**: Processes the data by converting text-based numeric values into numeric format.
 - **test_fetch_data.py**: Contains tests to verify that data retrieval from the API is functioning as expected.
-- **BNDES_COVID19_Data_Analysis_Notebook.ipynb**: A Jupyter Notebook that demonstrates data loading, preprocessing, and analysis.
+- **bndes_analysis.ipynb**: A Jupyter Notebook that demonstrates data loading, preprocessing, and analysis.
 
 ## Setup Instructions
 
@@ -25,8 +25,8 @@ This project is designed to fetch, preprocess, and analyze data from the Brazili
 
 1. Clone this repository:
    ```bash
-   git clone <repository-url>
-   cd <repository-directory>
+   git clone https://github.com/ntsation/bndes-emergency-measures.git
+   cd bndes-emergency-measures
    ```
 
 2. Install dependencies:
@@ -41,7 +41,7 @@ This project is designed to fetch, preprocess, and analyze data from the Brazili
   - `word_to_num(word)`: Maps words like "million" and "thousand" to their numeric equivalents.
   - `convert_to_numeric(value)`: Uses regular expressions to replace text-based numbers with numeric values.
 - **test_fetch_data.py**: Tests the `fetch_data` function to confirm data retrieval from the API.
-- **BNDES_COVID19_Data_Analysis_Notebook.ipynb**: Interactive notebook that:
+- **bndes_analysis.ipynb**: Interactive notebook that:
   - Loads and preprocesses data.
   - Generates statistical summaries and visualizations.
   - Analyzes distribution patterns and top categories by amount/value.
@@ -73,5 +73,5 @@ pytest test_fetch_data.py
 To run the full analysis, open the Jupyter Notebook:
 
 ```bash
-jupyter notebook BNDES_COVID19_Data_Analysis_Notebook.ipynb
+jupyter notebook bndes_analysis.ipynb
 ```
