@@ -122,7 +122,7 @@ terraform apply
 terraform output
 ```
 
-## 🔧 Configuration
+## Configuration
 
 Key configuration variables in `terraform/main.tf`:
 
@@ -135,7 +135,7 @@ Key configuration variables in `terraform/main.tf`:
 | `alarm_email` | `""` | Email for alerts |
 | `log_retention_days` | `30` | CloudWatch logs retention |
 
-## 📈 Monitoring
+## Monitoring
 
 ### CloudWatch Dashboard
 Access the monitoring dashboard:
@@ -176,7 +176,7 @@ Access the monitoring dashboard:
 aws cloudwatch describe-alarms --alarm-name-prefix bndes-emergency-measures
 ```
 
-## 🔄 CI/CD Pipeline
+## CI/CD Pipeline
 
 The project includes a complete CI/CD pipeline using GitHub Actions, split into modular workflows:
 
@@ -187,7 +187,7 @@ The project includes a complete CI/CD pipeline using GitHub Actions, split into 
 5. **Terraform Plan**: Generates an infrastructure plan (on pull requests).
 6. **Deploy**: Applies infrastructure changes (on push to main).
 
-## 💰 Cost Estimate
+## Cost Estimate
 
 Monthly costs (us-east-1):
 - Lambda: ~$0.20
@@ -200,17 +200,17 @@ Monthly costs (us-east-1):
 
 **Total: ~$0.48/month**
 
-## 🔒 Security Features
+## Security Features
 
-- ✅ KMS encryption for S3 data
-- ✅ Least-privilege IAM policies
-- ✅ S3 bucket blocks public access
-- ✅ No hardcoded credentials
-- ✅ Lambda environment variables encrypted
-- ✅ ECR image scanning enabled
-- ✅ Terraform state versioned and encrypted
+- KMS encryption for S3 data
+- Least-privilege IAM policies
+- S3 bucket blocks public access
+- No hardcoded credentials
+- Lambda environment variables encrypted
+- ECR image scanning enabled
+- Terraform state versioned and encrypted
 
-## 🧪 Testing
+## Testing
 
 Run tests locally:
 ```bash
