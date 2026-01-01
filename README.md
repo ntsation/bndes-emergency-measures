@@ -93,45 +93,65 @@ bndes-emergency-measures/
 ## Quick Start
 
 ### Prerequisites
+- AWS Account with appropriate permissions
+- AWS CLI configured
+- Docker installed
+- Terraform >= 1.5.0
+- Python 3.11
+- GitHub account (for CI/CD)
 
-- Python 3.7 or higher
-- Recommended packages:
-  - `requests`
-  - `pandas`
-  - `matplotlib`
-  - `seaborn`
-  - `pytest` (for testing)
-
-### Installation
-
-1. Clone this repository:
-   ```bash
-   git clone https://github.com/ntsation/bndes-emergency-measures.git
-   cd bndes-emergency-measures
-   ```
-
-2. Install dependencies:
-   ```bash
-   pip install -r requirements.txt
-   ```
-
-### File Descriptions
-
-- **fetch_data.py**: Contains `fetch_data()` to fetch and load data from the BNDES API. If the request is successful, it returns the data as a DataFrame.
-- **process_data.py**: Contains functions to convert text-based numeric values. Functions include:
-  - `word_to_num(word)`: Maps words like "million" and "thousand" to their numeric equivalents.
-  - `convert_to_numeric(value)`: Uses regular expressions to replace text-based numbers with numeric values.
-- **test_fetch_data.py**: Tests the `fetch_data` function to confirm data retrieval from the API.
-- **bndes_analysis.ipynb**: Interactive notebook that:
-  - Loads and preprocesses data.
-  - Generates statistical summaries and visualizations.
-  - Analyzes distribution patterns and top categories by amount/value.
-
-## Running the Code
-
-### Fetching Data
+### 1. Set Up Terraform Backend
 
 ```bash
+chmod +x scripts/setup-terraform-backend.sh
+./scripts/setup-terraform-backend.sh
+```
+
+### 2. Deploy Infrastructure
+
+```bash
+cd terraform
+terraform init
+terraform plan
+terraform apply
+```
+
+### 3. Verify Deployment
+
+```bash
+terraform output
+```
+
+## 🔧 Configuration
+
+Key configuration variables in `terraform/main.tf`:
+
+| Variable | Default | Description |
+|-----------|---------|-------------|
+| `aws_region` | `us-east-1` | AWS region |
+| `project_name` | `bndes-emergency-measures` | Resource prefix |
+| `lambda_timeout` | `900` | Lambda timeout (seconds) |
+| `lambda_memory_size` | `1024` | Lambda memory (MB) |
+| `alarm_email` | `""` | Email for alerts |
+| `log_retention_days` | `30` | CloudWatch logs retention |
+
+## 📈 Monitoring
+
+### CloudWatch Dashboard
+Access the monitoring dashboard:
+```bash
+terraform output dashboard_url
+```
+
+Or navigate to: `CloudWatch > Dashboards > bndes-emergency-measures-dashboard`
+
+### View Logs
+```bash
+LOG_GROUP=$(terraform output log_group_name)
+aws logs tail $LOG_GROUP --follow
+```
+
+### Check Alarms
 terraform output
 ```
 
@@ -153,13 +173,46 @@ Key configuration variables in `terraform/main.tf`:
 ### CloudWatch Dashboard
 Access the monitoring dashboard:
 ```bash
-python process_data.py
+aws cloudwatch describe-alarms --alarm-name-prefix bndes-emergency-measures
 ```
 
-### Running Tests
+## 🔄 CI/CD Pipeline
 
-Run tests to verify data retrieval functionality:
+The project includes a complete CI/CD pipeline using GitHub Actions, split into modular workflows:
 
+1. **Lint Check**: Checks code style and quality.
+2. **Unit Tests**: Runs pytest with coverage.
+3. **Security Scan**: Scans code and dependencies for vulnerabilities.
+4. **Docker Build**: Builds and tests the Docker image.
+5. **Terraform Plan**: Generates an infrastructure plan (on pull requests).
+6. **Deploy**: Applies infrastructure changes (on push to main).
+
+## 💰 Cost Estimate
+
+Monthly costs (us-east-1):
+- Lambda: ~$0.20
+- ECR: ~$0.10
+- S3: ~$0.05
+- CloudWatch Logs: ~$0.10
+- SQS DLQ: ~$0.00
+- SNS: ~$0.00 (1000 free emails/month)
+- KMS: ~$0.03
+
+**Total: ~$0.48/month**
+
+## 🔒 Security Features
+
+- ✅ KMS encryption for S3 data
+- ✅ Least-privilege IAM policies
+- ✅ S3 bucket blocks public access
+- ✅ No hardcoded credentials
+- ✅ Lambda environment variables encrypted
+- ✅ ECR image scanning enabled
+- ✅ Terraform state versioned and encrypted
+
+## 🧪 Testing
+
+Run tests locally:
 ```bash
 pytest test_fetch_data.py
 ```
