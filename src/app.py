@@ -3,8 +3,13 @@ import os
 import boto3
 import pandas as pd
 from datetime import datetime
-from fetch_data import fetch_resources_by_year
-from process_data import process_data
+
+try:
+    from src.fetch_data import fetch_resources_by_year
+    from src.process_data import process_data
+except ImportError:
+    from fetch_data import fetch_resources_by_year
+    from process_data import process_data
 
 s3_client = boto3.client('s3')
 
