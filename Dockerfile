@@ -1,5 +1,4 @@
-FROM
- public.ecr.aws/lambda/python:3.11
+FROM public.ecr.aws/lambda/python:3.11
 
 RUN yum update -y glib2 && \
     yum clean all
