@@ -39,10 +39,6 @@ jobs:
       - name: Terraform Init
         run: terraform init -reconfigure
 
-      - name: Remove Backend Override
-        if: always()
-        run: rm -f backend_override.tf
-
       - name: Terraform Validate
         run: terraform validate
 
@@ -50,3 +46,7 @@ jobs:
         id: plan
         run: terraform plan -no-color -out=tfplan
         continue-on-error: true
+
+      - name: Remove Backend Override
+        if: always()
+        run: rm -f backend_override.tf
