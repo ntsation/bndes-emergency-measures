@@ -1,6 +1,6 @@
-# BNDES COVID-19 Emergency Measures Analysis
+# BNDES Balance Sheet Analysis
 
-This project is designed to fetch, preprocess, and analyze data from the Brazilian Development Bank (BNDES) Open Data API, specifically related to emergency COVID-19 measures. The project includes data retrieval, preprocessing for text-based numeric values, and exploratory data analysis.
+This project is designed to fetch, preprocess, and analyze data from the Brazilian Development Bank (BNDES) Open Data API. This dataset contains the BNDES Balance Sheet, presented in BRGAAP, IFRS, and Prudential Conglomerate standards. The project includes data retrieval, preprocessing for text-based numeric values, and exploratory data analysis.
 
 ## Project Structure
 
@@ -10,9 +10,9 @@ This project is designed to fetch, preprocess, and analyze data from the Brazili
 - **bndes_analysis.ipynb**: A Jupyter Notebook that demonstrates data loading, preprocessing, and analysis.
 
 ## Setup Instructions
-# BNDES Emergency Measures - Production AWS Architecture
+# BNDES Balance Sheet - Production AWS Architecture
 
-This project implements a production-ready system for fetching, processing, and storing BNDES emergency measures data on AWS using serverless technologies.
+This project implements a production-ready system for fetching, processing, and storing BNDES balance sheet data on AWS using serverless technologies.
 
 ## Features
 
