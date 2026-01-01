@@ -60,5 +60,5 @@ output "dashboard_url" {
 
 output "schedule_rule_name" {
   description = "CloudWatch Events schedule rule name"
-  value       = module.schedule.schedule_rule_name
+  value       = module.schedule.rule_name
 }

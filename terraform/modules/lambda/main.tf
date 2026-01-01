@@ -98,8 +98,8 @@ resource "aws_iam_role_policy" "lambda_dlq_policy" {
 
 resource "null_resource" "build_and_push_image" {
   triggers = {
-    dockerfile_hash = filesha1("${path.module}/../../Dockerfile")
-    app_hash        = filesha1("${path.module}/../../src/app.py")
+    dockerfile_hash = filesha1("${path.module}/../../../Dockerfile")
+    app_hash        = filesha1("${path.module}/../../../src/app.py")
   }
 
   provisioner "local-exec" {
