@@ -11,40 +11,36 @@ MOCK_PACKAGE_SHOW = {
                 "name": "Balanço 2023",
                 "datastore_active": True,
                 "url": "http://example.com/2023.csv",
-                "format": "CSV"
+                "format": "CSV",
             },
             {
                 "id": "res-2",
-                "name": "Balanço 2020", # Wrong year
+                "name": "Balanço 2020",  # Wrong year
                 "datastore_active": True,
                 "url": "http://example.com/2020.csv",
-                "format": "CSV"
+                "format": "CSV",
             },
             {
                 "id": "res-3",
-                "name": "Balanço 2023 (PDF)", # Not datastore active check logic
+                "name": "Balanço 2023 (PDF)",  # Not datastore active check logic
                 "datastore_active": False,
                 "url": "http://example.com/2023.pdf",
-                "format": "PDF"
-            }
+                "format": "PDF",
+            },
         ]
     }
 }
 
 # Mock data for datastore_search
 MOCK_DATASTORE_SEARCH = {
-    "result": {
-        "records": [
-            {"id": 1, "col": "val1"},
-            {"id": 2, "col": "val2"}
-        ]
-    }
+    "result": {"records": [{"id": 1, "col": "val1"}, {"id": 2, "col": "val2"}]}
 }
 
-@patch('src.fetch_data.requests.get')
+
+@patch("src.fetch_data.requests.get")
 def test_fetch_resources_by_year_success(mock_get):
     """Test fetching resources for a specific year successfully."""
-    
+
     # Configure mock side effects for sequential calls
     # 1. package_show
     # 2. datastore_search (for the matching resource)
@@ -66,16 +62,17 @@ def test_fetch_resources_by_year_success(mock_get):
     # Assertions
     assert len(results) == 1
     name, df = results[0]
-    
+
     assert name == "Balanço 2023"
     assert len(df) == 2
-    assert 'source_resource_name' in df.columns
-    assert df.iloc[0]['col'] == 'val1'
+    assert "source_resource_name" in df.columns
+    assert df.iloc[0]["col"] == "val1"
 
-@patch('src.fetch_data.requests.get')
+
+@patch("src.fetch_data.requests.get")
 def test_fetch_resources_no_match(mock_get):
     """Test fetching when no resources match the year."""
-    
+
     mock_response = MagicMock()
     mock_response.json.return_value = MOCK_PACKAGE_SHOW
     mock_get.return_value = mock_response
