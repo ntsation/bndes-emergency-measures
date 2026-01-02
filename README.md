@@ -1,14 +1,18 @@
-# BNDES Emergency Measures - Production AWS Architecture
+# BNDES Balance Sheet - Production AWS Architecture
 
-This project implements a production-ready system for fetching, processing, and storing BNDES emergency measures data on AWS using serverless technologies. The system automatically retrieves data from the BNDES Open Data API, processes it to handle text-based numeric values, and stores the processed data in S3 as Parquet files with date partitioning.
+This project implements a production-ready system for fetching, processing, and storing BNDES balance sheet data on AWS using serverless technologies. The system automatically retrieves data from the BNDES Open Data API, processes it for consistency, and stores the processed data in S3 as Parquet files with date partitioning.
 
 ## Overview
 
-The BNDES (Brazilian Development Bank) Emergency Measures dataset contains crucial information about government financial interventions and emergency economic measures. This project provides:
+This project provides automated access to the BNDES Balance Sheet data, which contains the bank's financial statements presented in three standards:
+- **BRGAAP** (Brazilian Generally Accepted Accounting Principles)
+- **IFRS** (International Financial Reporting Standards)
+- **Prudential Conglomerate**
 
-- **Automated Data Ingestion**: Daily automated fetching of the latest BNDES emergency measures data
-- **Data Processing**: Intelligent conversion of text-based numeric values (e.g., "(1.234)" to -1234)
-- **Data Storage**: Efficient storage in Parquet format with date-based partitioning in S3
+The system provides:
+
+- **Automated Data Ingestion**: Automated fetching of BNDES balance sheet data by year
+- **Data Processing**: Data cleaning and consolidation from multiple resources
 - **Monitoring**: Complete observability with CloudWatch logs, metrics, alarms, and dashboards
 - **Alerting**: SNS notifications for failures and critical errors
 - **Infrastructure as Code**: Complete Terraform configuration for reproducible deployments
@@ -68,7 +72,7 @@ The BNDES (Brazilian Development Bank) Emergency Measures dataset contains cruci
 
 1. **Trigger**: CloudWatch Events triggers the Lambda function daily at 03:00 UTC
 2. **Fetch Data**: Lambda fetches data from the BNDES Open Data API
-3. **Process Data**: The data is processed to convert text-based numeric values (e.g., "(1.234)" becomes -1234)
+3. **Process Data**: The data is cleaned and consolidated from multiple resources
 4. **Store Data**: Processed data is converted to Parquet format and uploaded to S3
 5. **Partitioning**: Files are stored with date-based partitioning (e.g., `s3://bucket/2026/01/01/data.parquet`)
 6. **Monitoring**: All operations are logged to CloudWatch Logs
@@ -116,7 +120,7 @@ The BNDES (Brazilian Development Bank) Emergency Measures dataset contains cruci
 ## Project Structure
 
 ```
-bndes-emergency-measures/
+bndes-data-pipeline/
 ├── src/                        # Source code
 │   ├── __init__.py
 │   ├── app.py                  # Lambda entrypoint with S3 upload logic
@@ -184,21 +188,24 @@ bndes-emergency-measures/
 
 ### Data Source
 
-The system fetches data from the BNDES Open Data API, which provides emergency measures information including:
+The system fetches data from the BNDES Open Data API's "balanco-patrimonial" dataset, which contains the BNDES Balance Sheet presented in three accounting standards:
+- **BRGAAP** (Brazilian Generally Accepted Accounting Principles)
+- **IFRS** (International Financial Reporting Standards)
+- **Prudential Conglomerate**
 
-- Emergency measure descriptions
-- Financial values (in various formats)
-- Dates and timestamps
-- Categories and classifications
-- Status information
+The data includes financial information such as:
+- Account descriptions and classifications
+- Financial values and balances
+- Period information
+- Standard-specific metrics
 
 ### Data Transformation
 
-The `process_data.py` module handles several data quality issues:
+The `process_data.py` module performs data cleaning and preparation:
 
-1. **Text-based Numeric Values**: Converts values like "(1.234)" to -1234
-2. **Missing Values**: Handles null and empty string values
-3. **Data Types**: Converts strings to appropriate numeric types (int, float)
+1. **Data Cleaning**: Removes empty rows and cleans text fields (e.g., strips whitespace from descriptions)
+2. **Data Consolidation**: Combines multiple resources (e.g., different accounting standards) into a single consolidated dataset
+3. **Metadata Addition**: Adds source resource name and ID for traceability
 4. **Validation**: Ensures data integrity before storage
 
 ### Output Format
@@ -226,8 +233,8 @@ Before you begin, ensure you have the following:
 ### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/your-username/bndes-emergency-measures.git
-cd bndes-emergency-measures
+git clone https://github.com/your-username/bndes-data-pipeline.git
+cd bndes-data-pipeline
 ```
 
 ### 2. Install Python Dependencies
@@ -256,7 +263,7 @@ Edit `terraform/terraform.tfvars` with your desired values:
 
 ```hcl
 aws_region          = "us-east-1"
-project_name        = "bndes-emergency-measures"
+project_name        = "bndes-data-pipeline"
 lambda_timeout      = 900
 lambda_memory_size  = 1024
 alarm_email         = "your-email@example.com"
@@ -287,10 +294,10 @@ REGION=$(terraform output aws_region)
 aws ecr get-login-password --region $REGION | docker login --username AWS --password-stdin $ECR_URI
 
 # Build the image
-docker build -t bndes-emergency-measures:latest .
+docker build -t bndes-data-pipeline:latest .
 
 # Tag the image
-docker tag bndes-emergency-measures:latest $ECR_URI:latest
+docker tag bndes-data-pipeline:latest $ECR_URI:latest
 
 # Push the image
 docker push $ECR_URI:latest
@@ -357,7 +364,7 @@ Key configuration variables in `terraform/main.tf`:
 | Variable | Type | Default | Description |
 |-----------|------|---------|-------------|
 | `aws_region` | string | `us-east-1` | AWS region for deployment |
-| `project_name` | string | `bndes-emergency-measures` | Prefix for all AWS resources |
+| `project_name` | string | `bndes-data-pipeline` | Prefix for all AWS resources |
 | `lambda_timeout` | number | `900` | Lambda function timeout in seconds (max 900) |
 | `lambda_memory_size` | number | `1024` | Lambda function memory in MB (128-10288) |
 | `alarm_email` | string | `""` | Email address for SNS notifications |
@@ -387,7 +394,7 @@ terraform output dashboard_url
 Or navigate manually in AWS Console:
 1. Open CloudWatch Console
 2. Go to Dashboards
-3. Select `bndes-emergency-measures-dashboard`
+3. Select `bndes-data-pipeline-dashboard`
 
 The dashboard displays:
 - Lambda invocation metrics (invocations, errors, duration, throttles)
@@ -412,7 +419,7 @@ aws logs tail $LOG_GROUP --follow
 List all alarms associated with the project:
 
 ```bash
-aws cloudwatch describe-alarms --alarm-name-prefix bndes-emergency-measures
+aws cloudwatch describe-alarms --alarm-name-prefix bndes-data-pipeline
 ```
 
 ### Custom Metrics
@@ -509,13 +516,13 @@ Build the Docker image locally for testing:
 
 ```bash
 # Build the image
-docker build -t bndes-emergency-measures:latest .
+docker build -t bndes-data-pipeline:latest .
 
 # Run the container
 docker run -p 9000:8080 \
   -e S3_BUCKET_NAME="test-bucket" \
   -e LOCAL_OUTPUT_DIR="/tmp/local_data" \
-  bndes-emergency-measures:latest
+  bndes-data-pipeline:latest
 ```
 
 ### Running Locally (Simulation)
@@ -726,7 +733,7 @@ We welcome contributions! Please follow these guidelines:
 
 1. **Fork the Repository**
    ```bash
-   git clone https://github.com/your-username/bndes-emergency-measures.git
+   git clone https://github.com/your-username/bndes-data-pipeline.git
    ```
 
 2. **Create a Feature Branch**
@@ -806,13 +813,13 @@ terraform validate
 terraform fmt -recursive
 
 # Get CloudWatch logs
-aws logs tail /aws/lambda/bndes-emergency-measures --follow
+aws logs tail /aws/lambda/bndes-data-pipeline --follow
 
 # Describe Lambda function
-aws lambda get-function --function-name bndes-emergency-measures
+aws lambda get-function --function-name bndes-data-pipeline
 
 # List S3 objects
-aws s3 ls s3://bndes-emergency-measures-data --recursive
+aws s3 ls s3://bndes-data-pipeline-data --recursive
 ```
 
 ## Acknowledgments
@@ -825,4 +832,4 @@ aws s3 ls s3://bndes-emergency-measures-data --recursive
 
 **Built with AWS Serverless Technologies**
 
-For more information, visit the [project repository](https://github.com/your-username/bndes-emergency-measures).
+For more information, visit the [project repository](https://github.com/your-username/bndes-data-pipeline).
